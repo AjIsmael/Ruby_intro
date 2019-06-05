@@ -1,5 +1,7 @@
+$ALL_FIGHTERS = [ ]
+$EQUIPMENTS = ["boots", "sword"]
 class Warrior
-  attr_accessor :name, :hp, :mp, :atk, :magic, :status
+  attr_accessor :name, :hp, :mp, :atk, :magic, :status, :speed, :ct,:equ
   def initialize(name)
     @name = name
     self.hp = 100
@@ -7,20 +9,35 @@ class Warrior
     self.atk = 30
     self.magic = 5
     self.status = "alive"
+    self.speed = 7
+    self.ct = 0
+    self.equ = []
+    $ALL_FIGHTERS << self
   end
 
   def attack(target)
     target.hp -= self.atk
     puts "#{@name} attacked #{target.name}"
-    target.status = 'fallen'
     if target.hp < 1
+      target.status = 'fallen'
+      $ALL_FIGHTERS.delete(target)
       puts "#{target.name} has fallen!"
     end
+  end
+
+  def equip()
+    puts "What do you want to equip #{self.name}"
+    for equipment in $EQUIPMENTS
+      puts equipment
+    end
+    equipped = gets.chomp.to_i
+    self.equ << $EQUIPMENTS[equipped]
+
   end
 end
 
 class Mage
-  attr_accessor :name, :hp, :mp, :atk, :magic, :status
+  attr_accessor :name, :hp, :mp, :atk, :magic, :status, :speed, :ct
   def initialize(name)
     @name = name
     self.hp = 60
@@ -28,6 +45,9 @@ class Mage
     self.atk = 10
     self.magic = 40
     self.status = "alive"
+    self.ct = 0
+    self.speed = 5
+    $ALL_FIGHTERS << self
   end
 
   def cast_spell(target)
@@ -35,55 +55,31 @@ class Mage
     puts "#{@name} casted Firaga on #{target.name}"
     if target.hp < 1
       target.status = 'fallen'
+      $ALL_FIGHTERS.delete(target)
       puts "#{target.name} has burned!"
     end
   end
 end
 
-class Dragonmaster
-  attr_accessor :name, :hp, :mp, :atk, :brn, :magic, :status
-  def initialize(name)
-    @name = name
-    self.hp = 100
-    self.mp = 150
-    self.atk = 3
-    self.magic = 40
-    self.brn = 50
-    self.status = "alive"
-  end
-
-  def burn(target)
-    target.hp -= self.brn
-    puts "#{@name}'s dragon burned #{target.name}"
-    if target.hp < 1
-      target.status = 'fallen'
-      puts "#{target.name} has burned!"
-    end
-  end
-end
-
-
-def take_turn(player, t)
+def take_turn(player)
   if player.class == Warrior
-    puts "Select an action\n1-Attack\n2-Pass\n3-Quit"
+    puts "\n #{player.name}'s turn! Select an action\n1-Attack\n2-Pass\n3-Quit"
     answer = gets.chomp.to_i
     if answer == 1
-      puts "#{player.name} attacked"
-      player.attack(t)
-    elsif answer == 2
-      puts "skipping turn ..."
-    elsif answer == 3
-      puts "Exiting game"
-      $battle_time = false
-    else
-      puts "Invalid input"
-    end
-  elsif player.class == Dragonmaster
-    puts "Select an action\n1-Burn\n2-Pass\n3-Quit"
-    answer = gets.chomp.to_i
-    if answer == 1
-      puts "#{player.name} attacked"
-      player.burn(t)
+      puts "who will you attack"
+      for fighter in $ALL_FIGHTERS
+        if fighter.name == player.name
+          puts "self attack"
+        else
+          puts "#{fighter.name}"
+        end
+      end
+      target = gets.chomp.to_i
+      if target > ($ALL_FIGHTERS.length - 1)
+        puts "You missed dump ass"
+      else
+        player.attack($ALL_FIGHTERS[target])
+      end
     elsif answer == 2
       puts "skipping turn ..."
     elsif answer == 3
@@ -109,20 +105,17 @@ def take_turn(player, t)
   end
 end
 
-def start_battle(p1,p2)
+def start_battle(fighters)
   puts "Battle begins!"
   $battle_time = true
   turn_count = 0
   while $battle_time
-    if p1. status == 'fallen' || p2.status == 'fallen'
-      puts "The battle is over"
-      break
+    fighters.each do |fighter|
+      fighter.ct += fighter.speed
+      if fighter.ct >= 100
+        take_turn(fighter)
+      end
     end
-    turn_count += 1
-    if turn_count%2 == 0
-      take_turn(p1,p2)
-    else
-      take_turn(p2,p1)
-    end
+
   end
 end
