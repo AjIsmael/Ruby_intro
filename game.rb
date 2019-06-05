@@ -21,7 +21,6 @@ class Unit
 end
 
 class Squire < Unit #inheritence
-
  def initialize(name)
    super(name) #function that calls the superclass's constructor
  end
@@ -34,7 +33,7 @@ end
 
 class Wizard < Unit
  def initialize(name)
-   spuer(name)
+   super(name)
    self.hp -= 10
    self.speed -= 2
    self.mp += 30
@@ -54,7 +53,7 @@ class Knight < Unit
  end
 
  def rend_armor()
-   "#{self.name} rend armor! Everything is now rent!"
+   puts "#{self.name} rend armor! Everything is now rent!"
  end
 end
 
@@ -69,6 +68,7 @@ def battle_is_over? # boolean function/methods. The "?" is for readability.
  end
  if dead_units.count(false) > 1
    return false #it is important to return a boolean value
+ end
 end
 
 def take_turn(u)
